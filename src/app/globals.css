@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 9%;
+
+    --secondary: 0 0% 11%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 60 70% 50%;
+    --accent-foreground: 0 0% 9%;
+
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 70%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 9%;
+
+    --secondary: 0 0% 11%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 60 70% 50%;
+    --accent-foreground: 0 0% 9%;
+
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* NodeOps cards and stats */
+.stats-card {
+  @apply bg-card rounded-xl border border-border overflow-hidden transition-all duration-200;
+}
+
+.task-item {
+  @apply flex items-center justify-between p-3 rounded-xl hover:bg-secondary/30 transition-all;
+}
+
+.task-item:hover {
+  @apply border-accent/30;
+}
+
+.network-node {
+  @apply rounded-full flex items-center justify-center text-xs text-white font-medium shadow-md;
+  height: 28px;
+  width: 28px;
+}
+
+.network-u2 {
+  @apply bg-yellow-500;
+}
+
+.network-el {
+  @apply bg-blue-500;
+}
+
+.network-og {
+  @apply bg-purple-500;
+}
+
+.network-graph {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.network-map {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  background-color: rgba(0, 0, 0, 0.5);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cdefs%3E%3Cpattern id='grid' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 20 0 L 0 0 0 20' fill='none' stroke='rgba(255, 255, 0, 0.1)' stroke-width='0.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='%23121212'/%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E");
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.node-point {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+/* Animation for the nodes pulse */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 255, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 0, 0); }
+}
+
+.node-active {
+  animation: pulse 2s infinite;
+}
+
+/* 모달 애니메이션 효과 */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* 펄스 애니메이션 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 지구본 컨테이너 스타일 */
+.network-graph {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 마우스 호버 효과 */
+.network-graph div {
+  cursor: grab;
+}
+
+.network-graph div:active {
+  cursor: grabbing;
+}
