@@ -182,17 +182,28 @@ function NetworkGlobe() {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
-    // 마우스 클릭 이벤트 리스너
+    // 마우스 클릭 이벤트 리스너 (수정된 부분)
     const handleClick = (event) => {
+      // 이벤트 타입 확인 및 안전한 값 추출
+      let clientX, clientY;
+
+      // 터치 이벤트인 경우
+      if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+      }
+      // 마우스 이벤트인 경우
+      else if (event.clientX !== undefined && event.clientY !== undefined) {
+        clientX = event.clientX;
+        clientY = event.clientY;
+      }
+      // 유효한 좌표가 없는 경우 종료
+      else {
+        return;
+      }
+
       // 마우스/터치 위치 계산 (정규화된 장치 좌표)
       const rect = renderer.domElement.getBoundingClientRect();
-
-      // 모바일 터치와 데스크탑 클릭 모두 처리
-      const clientX = event.clientX || (event.touches && event.touches[0].clientX);
-      const clientY = event.clientY || (event.touches && event.touches[0].clientY);
-
-      if (clientX === undefined || clientY === undefined) return;
-
       mouse.x = ((clientX - rect.left) / width) * 2 - 1;
       mouse.y = -((clientY - rect.top) / height) * 2 + 1;
 
@@ -214,13 +225,27 @@ function NetworkGlobe() {
     let autoRotate = true;
     let isDragging = false;
 
-    // 포인터 이벤트 리스너 (마우스 및 터치 모두 처리)
-    const handlePointerDown = (e) => {
+    // 포인터 이벤트 리스너 (수정된 부분)
+    const handlePointerDown = (event) => {
       isPointerDown = true;
-      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
 
-      if (clientX === undefined || clientY === undefined) return;
+      // 이벤트 타입 확인 및 안전한 값 추출
+      let clientX, clientY;
+
+      // 터치 이벤트인 경우
+      if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+      }
+      // 마우스 이벤트인 경우
+      else if (event.clientX !== undefined && event.clientY !== undefined) {
+        clientX = event.clientX;
+        clientY = event.clientY;
+      }
+      // 유효한 좌표가 없는 경우 종료
+      else {
+        return;
+      }
 
       pointerX = clientX;
       pointerY = clientY;
@@ -228,10 +253,10 @@ function NetworkGlobe() {
       isDragging = false; // 드래그 시작 시 초기화
     };
 
-    const handlePointerUp = (e) => {
+    const handlePointerUp = (event) => {
       if (!isDragging) {
         // 드래그하지 않고 단순 클릭/탭한 경우에만 클릭 이벤트 처리
-        handleClick(e);
+        handleClick(event);
       }
 
       isPointerDown = false;
@@ -240,13 +265,26 @@ function NetworkGlobe() {
       }, 3000); // 3초 후 자동 회전 다시 시작
     };
 
-    const handlePointerMove = (e) => {
+    const handlePointerMove = (event) => {
       if (!isPointerDown) return;
 
-      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      // 이벤트 타입 확인 및 안전한 값 추출
+      let clientX, clientY;
 
-      if (clientX === undefined || clientY === undefined) return;
+      // 터치 이벤트인 경우
+      if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+      }
+      // 마우스 이벤트인 경우
+      else if (event.clientX !== undefined && event.clientY !== undefined) {
+        clientX = event.clientX;
+        clientY = event.clientY;
+      }
+      // 유효한 좌표가 없는 경우 종료
+      else {
+        return;
+      }
 
       const deltaX = clientX - pointerX;
       const deltaY = clientY - pointerY;
@@ -275,15 +313,23 @@ function NetworkGlobe() {
       pointerY = clientY;
     };
 
+    // 터치 이벤트 핸들러에서 preventDefault 추가
+    const preventDefaultTouch = (e) => {
+      e.preventDefault();
+    };
+
     // 데스크탑 이벤트
     renderer.domElement.addEventListener('mousedown', handlePointerDown);
     renderer.domElement.addEventListener('mouseup', handlePointerUp);
     renderer.domElement.addEventListener('mousemove', handlePointerMove);
 
     // 모바일 터치 이벤트
-    renderer.domElement.addEventListener('touchstart', handlePointerDown);
+    renderer.domElement.addEventListener('touchstart', handlePointerDown, { passive: false });
     renderer.domElement.addEventListener('touchend', handlePointerUp);
-    renderer.domElement.addEventListener('touchmove', handlePointerMove);
+    renderer.domElement.addEventListener('touchmove', handlePointerMove, { passive: false });
+
+    // 스크롤 방지 (모바일)
+    renderer.domElement.addEventListener('touchmove', preventDefaultTouch, { passive: false });
 
     // 창 크기 조절 이벤트 리스너
     const handleResize = () => {
@@ -333,6 +379,7 @@ function NetworkGlobe() {
       renderer.domElement.removeEventListener('touchstart', handlePointerDown);
       renderer.domElement.removeEventListener('touchend', handlePointerUp);
       renderer.domElement.removeEventListener('touchmove', handlePointerMove);
+      renderer.domElement.removeEventListener('touchmove', preventDefaultTouch);
 
       cancelAnimationFrame(animationId);
 
